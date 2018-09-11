@@ -1,0 +1,7 @@
+{
+  "rootPath": "github.com/crabbymonkey/nerf-contorller",
+  "heroku": {
+      "install" : [ "./..." ],
+      "goVersion": "go1.10"
+       }
+}

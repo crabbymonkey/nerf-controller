@@ -1,0 +1,28 @@
+{{define "header"}}
+  <html>
+  	<head>
+  		<title>{{.PageTitle}}</title>
+      <link rel="icon" href="/static/img/twenty-sided-dice.png">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <link href="/static/stylesheets/style.css" rel="stylesheet" type="text/css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+      <nav id="custom-bootstrap-menu" class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="container-fluid">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-menubuilder"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+              </div>
+              <div class="collapse navbar-collapse navbar-menubuilder">
+                <ul class="nav navbar-nav navbar-left">
+                  <li><a href="/">Home</a>
+                  </li>
+                  <li><a href="/about">About</a>
+                  </li>
+                </ul>
+              </div>
+          </div>
+      </nav>
+{{end}}

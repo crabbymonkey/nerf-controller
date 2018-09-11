@@ -1,0 +1,17 @@
+{{define "404"}}
+  {{template "header" .}}
+    <style>
+      body, html {
+          height: 100%;
+          margin: 0;
+      }
+    </style>
+    <div class="center-container">
+      <div class="bg" style="background-image: url('/static/img/black-and-white-blank-challenge-262488.jpg');"></div>
+      <div class="center-container centered">
+        <div class="outline outline-big">404</div>
+        <div class="outline outline-small">Looks like something is missing...</div>
+      </div>
+    </div>
+  {{template "footer" .}}
+{{end}}

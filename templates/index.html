@@ -1,0 +1,39 @@
+{{define "index"}}
+  {{template "header" .}}
+  <div class="center-container centered">
+    <h1> Welcome to the Interactive Nerf Shooter!</h1>
+    <p>
+      This is the home page for the nerf shooter, you can test the shooter with the "TEST FIRE!" button. Also, to connect this to other serveices you can fillout the information bellow.
+    </p>
+
+      <form action="">
+        <button type="submit" class="btn btn-danger btn-lg">TEST FIRE!</button>
+      </form>
+
+      <br>
+      <br>
+
+      <form action="">
+        <div class="form-group">
+          <label for="pwd">StreamLabs Authentication Token:</label>
+          <input type="password" class="form-control" id="streamlabs-token">
+        </div>
+        <div class="checkbox">
+          <label><input type="checkbox" onclick="myFunction()">Show Token</label>
+        </div>
+        <button type="submit" class="btn btn-success btn-sm">Submit</button>
+      </form>
+  </div>
+
+  <script>
+  function myFunction() {
+      var x = document.getElementById("streamlabs-token");
+      if (x.type === "password") {
+          x.type = "text";
+      } else {
+          x.type = "password";
+      }
+  }
+  </script>
+  {{template "footer" .}}
+{{end}}
