@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 //Compile templates on start
@@ -16,6 +17,16 @@ var templates = template.Must(template.ParseFiles(
 	"templates/header.html",
 	"templates/footer.html",
 	"templates/index.html"))
+
+func fire() {
+	currentTime := time.Now()
+	fmt.Println("{" + currentTime.Format(time.RFC1123) + "} FIRE!!!")
+}
+
+func saveToken(token string) {
+	currentTime := time.Now()
+	fmt.Println("{" + currentTime.Format(time.RFC1123) + "} saving token: " + token)
+}
 
 //Display the named template
 func display(w http.ResponseWriter, tmpl string, data interface{}) {
@@ -35,6 +46,10 @@ func randomPageHandler(w http.ResponseWriter, r *http.Request) {
 	// Else show the 404 page
 	if r.URL.Path == "/" {
 		homeHandler(w, r)
+	} else if r.URL.Path == "/fire" {
+		fireHandler(w, r)
+	} else if r.URL.Path == "/token" {
+		tokenHandler(w, r)
 	} else if strings.HasSuffix(r.URL.Path[1:], ".html") {
 		http.ServeFile(w, r, "static/html/"+r.URL.Path[1:])
 	} else {
@@ -43,12 +58,24 @@ func randomPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func fireHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		fire()
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func tokenHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		saveToken(r.FormValue("streamlabs"))
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	w.WriteHeader(status)
 	if status == http.StatusNotFound {
 		display(w, "404", &Page{PageTitle: "404"})
-	} else {
-		http.ServeFile(w, r, "static/html/issue.html")
 	}
 }
 
@@ -66,11 +93,8 @@ func getPort() string {
 }
 
 func main() {
-	// http.HandleFunc("", homeHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
 	http.HandleFunc("/", randomPageHandler)
-
 	var port = getPort()
 	fmt.Println("Now listening to port " + port)
 	log.Fatal(http.ListenAndServe(port, nil))

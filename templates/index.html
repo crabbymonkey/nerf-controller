@@ -6,17 +6,17 @@
       This is the home page for the nerf shooter, you can test the shooter with the "TEST FIRE!" button. Also, to connect this to other serveices you can fillout the information bellow.
     </p>
 
-      <form action="">
+      <form method="post" action="/fire">
         <button type="submit" class="btn btn-danger btn-lg">TEST FIRE!</button>
       </form>
 
       <br>
       <br>
 
-      <form action="">
+      <form method="post" action="/token" enctype="application/x-www-form-urlencoded">
         <div class="form-group">
           <label for="pwd">StreamLabs Authentication Token:</label>
-          <input type="password" class="form-control" id="streamlabs-token">
+          <input type="password" class="form-control" id="streamlabs-token" name="streamlabs">
         </div>
         <div class="checkbox">
           <label><input type="checkbox" onclick="myFunction()">Show Token</label>
