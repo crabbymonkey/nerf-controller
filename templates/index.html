@@ -7,21 +7,17 @@
     </p>
 
       <form method="post" action="/fire">
-        <button type="submit" class="btn btn-danger btn-lg">TEST FIRE!</button>
+        <button type="submit" class="btn btn-warning btn-lg">TEST FIRE!</button>
       </form>
 
       <br>
       <br>
 
-      <form method="post" action="/token" enctype="application/x-www-form-urlencoded">
-        <div class="form-group">
-          <label for="pwd">StreamLabs Authentication Token:</label>
-          <input type="password" class="form-control" id="streamlabs-token" name="streamlabs">
-        </div>
-        <div class="checkbox">
-          <label><input type="checkbox" onclick="myFunction()">Show Token</label>
-        </div>
-        <button type="submit" class="btn btn-success btn-sm">Submit</button>
+      <form method="post" action="/stop" enctype="application/x-www-form-urlencoded">
+        <button type="submit" class="btn btn-danger btn-sm">Stop</button>
+      </form>
+      <form method="post" action="/activate" enctype="application/x-www-form-urlencoded">
+        <button type="submit" class="btn btn-success btn-sm">Run</button>
       </form>
   </div>
 
