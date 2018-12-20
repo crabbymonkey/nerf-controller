@@ -13,23 +13,34 @@
       <br>
       <br>
 
-      <form method="post" action="/stop" enctype="application/x-www-form-urlencoded">
-        <button type="submit" class="btn btn-danger btn-sm">Stop</button>
+      <form method="post" action="/stop" enctype="application/x-www-form-urlencoded" onsubmit="return setStopped();">
+        <button id="stopBtn" type="submit" class="btn btn-danger btn-sm">Stop</button>
       </form>
-      <form method="post" action="/activate" enctype="application/x-www-form-urlencoded">
-        <button type="submit" class="btn btn-success btn-sm">Run</button>
+      <form method="post" action="/activate" enctype="application/x-www-form-urlencoded" onsubmit="return setRunning();">
+        <button id="runBtn" type="submit" class="btn btn-success btn-sm">Run</button>
       </form>
   </div>
 
   <script>
-  function myFunction() {
-      var x = document.getElementById("streamlabs-token");
-      if (x.type === "password") {
-          x.type = "text";
-      } else {
-          x.type = "password";
+    function checkRunning() {
+      document.getElementById("runBtn").disabled = true;
+      document.getElementById("stopBtn").disabled = true;
+      if ({{.Running}}) {
+        document.getElementById("stopBtn").disabled = false;
       }
-  }
+      else {
+        document.getElementById("runBtn").disabled = false;
+      }
+    }
+    function setRunning() {
+      document.getElementById("runBtn").disabled = false;
+      document.getElementById("stopBtn").disabled = true;
+    }
+    function setStopped() {
+      document.getElementById("runBtn").disabled = true;
+      document.getElementById("stopBtn").disabled = false;
+    }
+    window.onload = checkRunning;
   </script>
   {{template "footer" .}}
 {{end}}

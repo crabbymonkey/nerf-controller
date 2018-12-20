@@ -7,16 +7,19 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
 var isRunning = false
 var appCode = ""
+var hopper = 0
 
 func logMessage(message string) {
 	currentTime := time.Now()
@@ -27,23 +30,106 @@ func getLifeLeftOfAccessToken(accessToken *AccessToken) time.Duration {
 	return (time.Duration(accessToken.LifeTime) * time.Second) - time.Since(accessToken.TimeBorn)
 }
 
+func handleFireing() {
+	for {
+		if hopper > 0 {
+			fire()
+			hopper--
+		}
+		time.Sleep(time.Duration(randomValue(10, 90)) * time.Second)
+	}
+}
+
 func listenAndHandleDonations(accessToken *AccessToken) {
+	lastDonationID := getLastDonationID(accessToken)
+	remainder := 0.00
 	for {
 		if !isRunning {
 			break
 		}
-		timeLeftOnAccessToken := getLifeLeftOfAccessToken(accessToken)
-		logMessage("Time remaining on access_token: " + (timeLeftOnAccessToken.Round(time.Second)).String())
-		if timeLeftOnAccessToken < time.Minute {
-			refreshAccessToken(accessToken)
-			if accessToken == nil {
-				log.Fatalln("error refreshing access token")
-				break
-			}
-		}
+
+		refreshAccessToken(accessToken)
+		// timeLeftOnAccessToken := getLifeLeftOfAccessToken(accessToken)
+		// logMessage("Time remaining on access_token: " + (timeLeftOnAccessToken.Round(time.Second)).String())
+		// if timeLeftOnAccessToken < time.Minute {
+		// 	refreshAccessToken(accessToken)
+		// 	if accessToken == nil {
+		// 		log.Fatalln("error refreshing access token")
+		// 		break
+		// 	}
+		// }
 		logMessage("checking for donations")
-		time.Sleep(1 * time.Second)
+		donations := getStreamlabsDonations(accessToken, nil, lastDonationID)
+		var donation Donation
+		for _, donation = range *donations {
+			fmt.Printf("%+v\n", donation)
+			intpart, div := math.Modf(donation.Amount)
+			hopper += int(intpart)
+			remainder += div
+			if remainder > 1 {
+				remainder--
+				hopper++
+			}
+			logMessage("Hopper: " + strconv.Itoa(hopper) + ", Remainder: " + fmt.Sprintf("%f", remainder))
+		}
+		if len(*donations) != 0 {
+			*lastDonationID = donation.DonationID //TODO: This shouldent be in the loop
+		}
+		time.Sleep(5 * time.Second)
 	}
+}
+
+func getStreamlabsDonations(accessToken *AccessToken, numDonations *int, afterDonationID *int) *[]Donation {
+	urlParams := url.Values{}
+	urlParams.Add("access_token", accessToken.Val)
+	urlParams.Add("currency", "USD")
+
+	if numDonations != nil {
+		urlParams.Add("limit", strconv.Itoa(*numDonations))
+	}
+	if afterDonationID != nil {
+		urlParams.Add("after", strconv.Itoa(*afterDonationID))
+	}
+	finalURL := "https://streamlabs.com/api/v1.0/donations?" + urlParams.Encode()
+	logMessage("request URL: " + finalURL)
+	resp, err := http.Get(finalURL)
+	if err != nil {
+		log.Fatalln(err)
+		return nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		log.Fatalln("bad response getting access_token: " + string(body))
+		return nil
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+		return nil
+	}
+
+	var rawDonations DonationData
+	err = json.Unmarshal(data, &rawDonations)
+	if err != nil {
+		log.Fatalln(err)
+		return nil
+	}
+
+	return &rawDonations.Data
+}
+
+func getLastDonationID(accessToken *AccessToken) *int {
+	if !isRunning {
+		return nil
+	}
+	numDonations := 1
+	donations := getStreamlabsDonations(accessToken, &numDonations, nil)
+	if len((*donations)) != 1 {
+		return nil
+	}
+	fmt.Printf("Last Donation:\n%+v\n", &(*donations)[0])
+	return &(*donations)[0].DonationID
 }
 
 //Compile templates on start
@@ -53,10 +139,13 @@ var templates = template.Must(template.ParseFiles(
 	"templates/footer.html",
 	"templates/index.html"))
 
+//GrantType is the type of the request, refresh or get a new token
 type GrantType string
 
 const (
-	RefreshToken      GrantType = "refresh_token"
+	//RefreshToken used to refresh the token
+	RefreshToken GrantType = "refresh_token"
+	//AuthorizationCode used to get a new code
 	AuthorizationCode GrantType = "authorization_code"
 )
 
@@ -111,7 +200,6 @@ func makeAccesTokenRequest(accessToken *AccessToken, grantType GrantType) {
 		accessToken = nil
 		return
 	}
-
 }
 
 func refreshAccessToken(accessToken *AccessToken) {
@@ -154,16 +242,12 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := Page{
 		PageTitle: "Home",
+		Running:   isRunning,
 	}
 	display(w, "index", data)
 }
 
 func liveHandler(w http.ResponseWriter, r *http.Request) {
-	data := Page{
-		PageTitle: "Live",
-	}
-	display(w, "index", data)
-
 	appCode = r.URL.Query().Get("code")
 	if !isRunning && appCode != "" {
 		accessToken := getAccessToken()
@@ -171,7 +255,15 @@ func liveHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatalln("error getting the access token")
 		}
 		isRunning = true
+
+		data := Page{
+			PageTitle: "Live",
+			Running:   isRunning,
+		}
+		display(w, "index", data)
+
 		go listenAndHandleDonations(accessToken)
+		go handleFireing()
 	}
 }
 
@@ -247,7 +339,7 @@ func activateHandler(w http.ResponseWriter, r *http.Request) {
 func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	w.WriteHeader(status)
 	if status == http.StatusNotFound {
-		display(w, "404", &Page{PageTitle: "404"})
+		display(w, "404", &Page{PageTitle: "404", Running: isRunning})
 	}
 }
 
@@ -275,6 +367,7 @@ func main() {
 //A Page structure
 type Page struct {
 	PageTitle string
+	Running   bool
 }
 
 //StreamLabsApp Object that holds the StreamLabs App info that comes from a JSON
@@ -291,4 +384,20 @@ type AccessToken struct {
 	LifeTime     int    `json:"expires_in"`
 	TokenType    string `json:"token_type"`
 	TimeBorn     time.Time
+}
+
+//DonationData object of the raw data returned from StreamLabs when getting donations
+type DonationData struct {
+	Data []Donation `json:"data"`
+}
+
+//Donation object returned from StreamLabs
+type Donation struct {
+	DonationID int     `json:"donation_id"`
+	CreatedAt  int     `json:"created_at"`
+	Currency   string  `json:"currency"`
+	Amount     float64 `json:"amount,string"`
+	Name       string  `json:"name"`
+	Message    string  `json:"message"`
+	Email      string  `json:"email"`
 }
