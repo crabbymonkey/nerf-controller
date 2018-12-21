@@ -50,15 +50,19 @@
       document.getElementById("stopBtn").disabled = false;
     }
     window.onload = checkRunning();
-    window.onload = updateHopper();
 
     function updateHopper() {
       var i;
-      for (i = 0; i < 9; i++) {
-        var hopper = document.getElementById('hopper');
-        hopper.outerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="23" stroke="grey" stroke-width="3" fill="yellow" /></svg>';
+      var hopper = document.getElementById('hopper');
+      hopper.innerHTML = ""
+      for (i = 0; i < {{.HopperSize}}; i++) {
+        hopper.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="23" stroke="grey" stroke-width="3" fill="yellow" /></svg>';
       }
     }
+
+    setInterval(function() {
+      updateHopper();
+    }, 2000);
   </script>
   {{template "footer" .}}
 {{end}}

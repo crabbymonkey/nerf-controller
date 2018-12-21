@@ -241,8 +241,9 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := Page{
-		PageTitle: "Home",
-		Running:   isRunning,
+		PageTitle:  "Home",
+		Running:    isRunning,
+		HopperSize: &hopper,
 	}
 	display(w, "index", data)
 }
@@ -366,8 +367,9 @@ func main() {
 
 //A Page structure
 type Page struct {
-	PageTitle string
-	Running   bool
+	PageTitle  string
+	Running    bool
+	HopperSize *int
 }
 
 //StreamLabsApp Object that holds the StreamLabs App info that comes from a JSON
