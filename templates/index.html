@@ -1,24 +1,33 @@
 {{define "index"}}
   {{template "header" .}}
-  <div class="center-container centered">
-    <h1> Welcome to the Interactive Nerf Shooter!</h1>
-    <p>
-      This is the home page for the nerf shooter, you can test the shooter with the "TEST FIRE!" button. Also, to connect this to other serveices you can fillout the information bellow.
-    </p>
-
-      <form method="post" action="/fire">
-        <button type="submit" class="btn btn-warning btn-lg">TEST FIRE!</button>
-      </form>
-
-      <br>
-      <br>
-
-      <form method="post" action="/stop" enctype="application/x-www-form-urlencoded" onsubmit="return setStopped();">
-        <button id="stopBtn" type="submit" class="btn btn-danger btn-sm">Stop</button>
-      </form>
-      <form method="post" action="/activate" enctype="application/x-www-form-urlencoded" onsubmit="return setRunning();">
-        <button id="runBtn" type="submit" class="btn btn-success btn-sm">Run</button>
-      </form>
+  <div class="row">
+    <div class="column chroma-key-background">
+      <h3 class="center-container">Log Actions</h3>
+    </div>
+    <div class="center-container column">
+      <div>
+        <h1> Welcome to the Interactive Nerf Shooter!</h1>
+        <p style="padding:20px;">
+          This is the home page for the nerf shooter, you can test the shooter with the "TEST FIRE!" button. Also, to connect this to other serveices you can fillout the information bellow.
+        </p>
+        <form method="post" action="/fire">
+          <button type="submit" class="btn btn-warning btn-lg">TEST FIRE!</button>
+        </form>
+        <br>
+        <br>
+        <form method="post" action="/stop" enctype="application/x-www-form-urlencoded" onsubmit="return setStopped();">
+          <button id="stopBtn" type="submit" class="btn btn-danger btn-sm">Stop</button>
+        </form>
+        <form method="post" action="/activate" enctype="application/x-www-form-urlencoded" onsubmit="return setRunning();">
+          <button id="runBtn" type="submit" class="btn btn-success btn-sm">Run</button>
+        </form>
+      </div>
+    </div>
+    <div class="column chroma-key-background">
+      <h3 class="center-container">Hopper Element</h3>
+      <div id="hopper" class="hopper">
+      </div>
+    </div>
   </div>
 
   <script>
@@ -40,7 +49,16 @@
       document.getElementById("runBtn").disabled = true;
       document.getElementById("stopBtn").disabled = false;
     }
-    window.onload = checkRunning;
+    window.onload = checkRunning();
+    window.onload = updateHopper();
+
+    function updateHopper() {
+      var i;
+      for (i = 0; i < 9; i++) {
+        var hopper = document.getElementById('hopper');
+        hopper.outerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="23" stroke="grey" stroke-width="3" fill="yellow" /></svg>';
+      }
+    }
   </script>
   {{template "footer" .}}
 {{end}}

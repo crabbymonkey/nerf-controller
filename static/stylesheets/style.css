@@ -56,11 +56,57 @@ body {
     background-size: cover;
 }
 
+.hopper
+{
+position: relative;
+}
+
+.hopper-ball
+{
+right: 0;
+bottom: 0;
+position: absolute;
+}
+
+.center {
+  margin: auto;
+  width: 100%;
+  padding: 10px;
+}
+
+.circle:before {
+  content: ' \25CF';
+  font-size: 100px;
+  color: yellow;
+  outline: 1px solid white;
+  padding: .2em .4em;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 10px;
+  border: 1px solid black;
+  height: 90%;
+}
 .centered {
     position: absolute;
     top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.chroma-key-background {
+  background-color: #00FF12;
 }
 
 a, a:hover, a:link, a:visited {
@@ -212,6 +258,7 @@ li:hover > .drop-menu li:nth-child(6) {
   -webkit-animation-fill-mode: forwards;
           animation-fill-mode: forwards;
 }
+
 @-webkit-keyframes dropmenu {
   0% {
     opacity: 0;
