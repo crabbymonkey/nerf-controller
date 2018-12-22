@@ -20,6 +20,7 @@ import (
 var isRunning = false
 var appCode = ""
 var hopper = 0
+var costPerShot = 1.00
 
 func logMessage(message string) {
 	currentTime := time.Now()
@@ -32,6 +33,9 @@ func getLifeLeftOfAccessToken(accessToken *AccessToken) time.Duration {
 
 func handleFireing() {
 	for {
+		if !isRunning {
+			break
+		}
 		if hopper > 0 {
 			fire()
 			hopper--
@@ -63,9 +67,10 @@ func listenAndHandleDonations(accessToken *AccessToken) {
 		var donation Donation
 		for _, donation = range *donations {
 			fmt.Printf("%+v\n", donation)
-			intpart, div := math.Modf(donation.Amount)
-			hopper += int(intpart)
-			remainder += div
+			//This should give us 2 parts full balls and a part of a ball from the user
+			fullShots, partalShot := math.Modf(donation.Amount / costPerShot)
+			hopper += int(fullShots)
+			remainder += partalShot
 			if remainder > 1 {
 				remainder--
 				hopper++
@@ -227,29 +232,31 @@ func display(w http.ResponseWriter, tmpl string, data interface{}) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	if isRunning {
-		requestURL, err := url.Parse("/live")
-		if err != nil {
-			log.Fatal(err)
-		}
-		requestQuery := requestURL.Query()
-		requestQuery.Set("code", appCode)
-		requestURL.RawQuery = requestQuery.Encode()
-
-		logMessage(requestURL.String())
-		http.Redirect(w, r, requestURL.String(), http.StatusSeeOther)
-	}
+	// if isRunning {
+	// 	requestURL, err := url.Parse("/live")
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	requestQuery := requestURL.Query()
+	// 	requestQuery.Set("code", appCode)
+	// 	requestURL.RawQuery = requestQuery.Encode()
+	//
+	// 	logMessage(requestURL.String())
+	// 	http.Redirect(w, r, requestURL.String(), http.StatusSeeOther)
+	// }
 
 	data := Page{
-		PageTitle:  "Home",
-		Running:    isRunning,
-		HopperSize: &hopper,
+		PageTitle: "Home",
 	}
 	display(w, "index", data)
 }
 
 func liveHandler(w http.ResponseWriter, r *http.Request) {
 	appCode = r.URL.Query().Get("code")
+	data := Page{
+		PageTitle: "Live",
+	}
+
 	if !isRunning && appCode != "" {
 		accessToken := getAccessToken()
 		if accessToken == nil {
@@ -257,15 +264,11 @@ func liveHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		isRunning = true
 
-		data := Page{
-			PageTitle: "Live",
-			Running:   isRunning,
-		}
-		display(w, "index", data)
-
 		go listenAndHandleDonations(accessToken)
 		go handleFireing()
 	}
+
+	display(w, "index", data)
 }
 
 func randomPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -282,6 +285,12 @@ func randomPageHandler(w http.ResponseWriter, r *http.Request) {
 		liveHandler(w, r)
 	} else if r.URL.Path == "/stop" {
 		stopHandler(w, r)
+	} else if r.URL.Path == "/api/hopper" {
+		getHopperSize(w, r)
+	} else if r.URL.Path == "/api/pricepershot" {
+		pricePerShotHandler(w, r)
+	} else if r.URL.Path == "/api/isrunning" {
+		getIsRunning(w, r)
 	} else if strings.HasSuffix(r.URL.Path[1:], ".html") {
 		http.ServeFile(w, r, "static/html/"+r.URL.Path[1:])
 	} else {
@@ -297,11 +306,39 @@ func fireHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func getHopperSize(res http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(res).Encode(hopper)
+}
+func getIsRunning(res http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(res).Encode(isRunning)
+}
+
 func stopHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		isRunning = false
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func pricePerShotHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method == "POST" {
+		req.ParseForm() //Parse url parameters passed, then parse the response packet for the POST body (request body)
+		// attention: If you do not call ParseForm method, the following data can not be obtained form
+		fmt.Println(req.Form) // print information on server side.
+		fmt.Println("path", req.URL.Path)
+		fmt.Println("scheme", req.URL.Scheme)
+		fmt.Println(req.Form["url_long"])
+		for k, v := range req.Form {
+			fmt.Println("key:", k)
+			fmt.Println("val:", strings.Join(v, ""))
+		}
+		costPerShotStr := (req.Form["pricepershot"])[0]
+		costPerShot, _ = strconv.ParseFloat(costPerShotStr, 64)
+		fmt.Println("costPerShotStr:", costPerShotStr)
+		http.Redirect(res, req, "/", http.StatusSeeOther)
+	} else if req.Method == "GET" {
+		json.NewEncoder(res).Encode(costPerShot)
+	}
 }
 
 func getStreamlabsAppInfo() StreamLabsApp {
@@ -340,7 +377,7 @@ func activateHandler(w http.ResponseWriter, r *http.Request) {
 func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	w.WriteHeader(status)
 	if status == http.StatusNotFound {
-		display(w, "404", &Page{PageTitle: "404", Running: isRunning})
+		display(w, "404", &Page{PageTitle: "404"})
 	}
 }
 
@@ -367,9 +404,7 @@ func main() {
 
 //A Page structure
 type Page struct {
-	PageTitle  string
-	Running    bool
-	HopperSize *int
+	PageTitle string
 }
 
 //StreamLabsApp Object that holds the StreamLabs App info that comes from a JSON

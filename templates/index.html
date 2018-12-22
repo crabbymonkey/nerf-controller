@@ -13,13 +13,19 @@
         <form method="post" action="/fire">
           <button type="submit" class="btn btn-warning btn-lg">TEST FIRE!</button>
         </form>
-        <br>
-        <br>
-        <form method="post" action="/stop" enctype="application/x-www-form-urlencoded" onsubmit="return setStopped();">
-          <button id="stopBtn" type="submit" class="btn btn-danger btn-sm">Stop</button>
+        <hr>
+        <h3>Start and Stop the Device</h3>
+        <form method="post" action="/stop" enctype="application/x-www-form-urlencoded">
+          <button id="stopBtn" type="submit" disabled="true" class="btn btn-danger btn-sm">Stop</button>
         </form>
-        <form method="post" action="/activate" enctype="application/x-www-form-urlencoded" onsubmit="return setRunning();">
-          <button id="runBtn" type="submit" class="btn btn-success btn-sm">Run</button>
+        <form method="post" action="/activate" enctype="application/x-www-form-urlencoded">
+          <button id="runBtn" type="submit" disabled="true" class="btn btn-success btn-sm ">Run</button>
+        </form>
+        <hr>
+        <h3>Set the Cost to Add a Ball to the Hopper</h3>
+        <form method="post" action="/api/pricepershot" enctype="application/x-www-form-urlencoded">
+          Current Price Per Shot: <input id="pricepershot" name="pricepershot" onchange="changeOfPrice()" type="number" min="0.01" step="0.01" value="0.00">
+            <button id="priceBtn" type="submit" class="btn btn-primary btn-sm">Set</button>
         </form>
       </div>
     </div>
@@ -31,37 +37,112 @@
   </div>
 
   <script>
-    function checkRunning() {
-      document.getElementById("runBtn").disabled = true;
-      document.getElementById("stopBtn").disabled = true;
-      if ({{.Running}}) {
+    // vars to keep upto date
+    var hopperSize
+    var isRunning
+    var pricePerShotValue
+
+    var priceHasBeenChanged = false
+
+    function changeOfPrice() {
+      console.log("changeOfPrice");
+      var pricePerShot = document.getElementById('pricepershot');
+      if(pricePerShot.value === "") {
+        priceHasBeenChanged = false;
+        updatePricePerShot();
+      }
+      else {
+        priceHasBeenChanged = true;
+        pricePerShot.value = parseFloat(pricePerShot.value).toFixed(2);
+      }
+    }
+
+    function updateRunning() {
+      getIsRunning()
+      if (isRunning) {
         document.getElementById("stopBtn").disabled = false;
+        document.getElementById("runBtn").disabled = true;
       }
       else {
         document.getElementById("runBtn").disabled = false;
+        document.getElementById("stopBtn").disabled = true;
       }
     }
-    function setRunning() {
-      document.getElementById("runBtn").disabled = false;
-      document.getElementById("stopBtn").disabled = true;
-    }
-    function setStopped() {
-      document.getElementById("runBtn").disabled = true;
-      document.getElementById("stopBtn").disabled = false;
-    }
-    window.onload = checkRunning();
 
     function updateHopper() {
       var i;
+      getHopperSize()
       var hopper = document.getElementById('hopper');
       hopper.innerHTML = ""
-      for (i = 0; i < {{.HopperSize}}; i++) {
+      for (i = 0; i < hopperSize; i++) {
         hopper.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="23" stroke="grey" stroke-width="3" fill="yellow" /></svg>';
       }
     }
 
+    function getHopperSize() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/hopper");
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                hopperSize = xhr.responseText.replace("\n", "");
+            }
+        };
+    }
+
+    function updateHopper() {
+      var i;
+      getHopperSize()
+      var hopper = document.getElementById('hopper');
+      hopper.innerHTML = ""
+      for (i = 0; i < hopperSize; i++) {
+        hopper.innerHTML += '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><circle cx="25" cy="25" r="23" stroke="grey" stroke-width="3" fill="yellow" /></svg>';
+      }
+    }
+
+    function getIsRunning() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/isrunning");
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if(xhr.responseText.replace("\n", "") === "true") {
+                  isRunning = true;
+                }
+                else {
+                  isRunning = false;
+                }
+            }
+        };
+    }
+
+    function getPricePerShot() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/pricepershot");
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+              pricePerShotValue = xhr.responseText.replace("\n", "");
+            }
+        };
+    }
+
+    function updatePricePerShot() {
+      getPricePerShot()
+      var pricePerShot = document.getElementById('pricepershot');
+      console.log(document.activeElement === pricePerShot);
+      if (!(priceHasBeenChanged || document.activeElement === pricePerShot)) {
+        pricePerShot.value = parseFloat(pricePerShotValue).toFixed(2);
+      }
+    }
+    window.onload = updateHopper();
+    window.onload = updateRunning();
+    window.onload = updatePricePerShot();
+
     setInterval(function() {
       updateHopper();
+      updateRunning();
+      updatePricePerShot();
     }, 2000);
   </script>
   {{template "footer" .}}
