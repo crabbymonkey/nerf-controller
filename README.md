@@ -7,7 +7,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Install Golang v11.x
+Setup StreamLabs account
+Create StreamLabs API App
 
 ```
 Give examples
@@ -17,16 +19,9 @@ Give examples
 
 A step by step series of examples that tell you how to get a development env running
 
-Say what the step will be
-
+Setup config file
 ```
 Give the example
-```
-
-And repeat
-
-```
-until finished
 ```
 
 End with an example of getting some data out of the system or using it for a little demo
@@ -48,12 +43,14 @@ Give an example
 Explain what these tests test and why
 
 ```
-Give an example
+make test
 ```
 
 ## Deployment
 
 Add additional notes about how to deploy this on a live system
+
+Setup raspberry pi.
 
 ## Built With
 
