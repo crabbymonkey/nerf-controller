@@ -8,8 +8,11 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 [Golang v1.11.x](https://golang.org/doc/install "Golang")
+
 [StreamLabs account](https://streamlabs.com/ "StreamLabs")
+
 [StreamLabs API App](https://streamlabs.com/dashboard#/apisettings "StreamLabs API App")
+
 make
 
 ### Installing
