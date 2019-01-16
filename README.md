@@ -7,13 +7,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-[Golang v1.11.x or higher](https://golang.org/doc/install "Golang")
-
-[StreamLabs account](https://streamlabs.com/ "StreamLabs")
-
-[StreamLabs API App](https://streamlabs.com/dashboard#/apisettings "StreamLabs API App")
-
-make
+* [Golang v1.11.x or higher](https://golang.org/doc/install "Golang")
+* [StreamLabs account](https://streamlabs.com/ "StreamLabs")
+* [StreamLabs API App](https://streamlabs.com/dashboard#/apisettings "StreamLabs API App")
+* make
 
 ### Installing
 
@@ -99,7 +96,7 @@ Setup raspberry pi. TODO: Still in progress.
 
 * [Golang](https://golang.org/) - Code Backend and Framework
 * [StreamLabs](https://streamlabs.com/) - Donations Management
-* Make - Code and Compilation Rules Management
+* make - Code and Compilation Rules Management
 
 ## Contributing
 
