@@ -24,22 +24,22 @@ A step by step series of examples that explains how to get a development environ
 3. Create a StreamLabs Application
 4. Create a StreamLabsAPI.json file in the project home directory to have the correct information for the application you created.
 	1. Example StreamLabsAPI.json:
-	```json
-	{
-  	"ClientID": "7FDyzIU5NPbDLJ0kvB5C5CYSay6VYxNoNmza0RW1",
-  	"ClientSecret": "wleRBri2UFhUFYBCdnDhOASgBm2uQ7H60vkC34hB",
-  	"RedirectURI": "http://localhost:8080/live"
-	}
-	```
+		```json
+		{
+  		"ClientID": "7FDyzIU5NPbDLJ0kvB5C5CYSay6VYxNoNmza0RW1",
+  		"ClientSecret": "wleRBri2UFhUFYBCdnDhOASgBm2uQ7H60vkC34hB",
+  		"RedirectURI": "http://localhost:8080/live"
+		}
+		```
 5. (Optional) If you would like to change what port is used you can set the PORT environment veriable. by default the port used is 8080.
 	1. Example of setting the port to 3000 instead of 8080 using a bash comand
-	```
-	PORT="3000"
-	```
+		```
+		PORT="3000"
+		```
 6. The setup should now be complete the program can be tested and run with the following make command from the project home directory.
-```
-make all run
-```
+	```
+	make all run
+	```
 
 If correctly setup you should see the following in the console.
 ```
