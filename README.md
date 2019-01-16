@@ -9,17 +9,16 @@ These instructions will get you a copy of the project up and running on your loc
 
 * [Golang v1.11.x or higher](https://golang.org/doc/install "Golang")
 * [StreamLabs account](https://streamlabs.com/ "StreamLabs")
-* [StreamLabs API App](https://streamlabs.com/dashboard#/apisettings "StreamLabs API App")
 * make
 
 ### Installing
 
 A step by step series of examples that explains how to get a development environment running. To build the system that will fire rounds see the Deployment section below.
 
-1.  Install Golang
-2. Create a SteamLabs account
-3. Create a StreamLabs Application
-4. Create a StreamLabsAPI.json file in the project home directory to have the correct information for the application you created.
+1. Create a [StreamLabs API App](https://streamlabs.com/dashboard#/apisettings "StreamLabs API App")
+	1. Click the "Register An App" button.
+	2. Fill out the information, most of the information dosen't matter except for **Whitelist Users should be your StreamLabs username and Redirect URI should be http://localhost:8080/live** (*Note: replace the 8080 with whatever port you would like to use*)
+2. Create a StreamLabsAPI.json file in the project home directory to have the correct information for the application you created.
 	1. Example StreamLabsAPI.json:
 		```json
 		{
@@ -28,12 +27,12 @@ A step by step series of examples that explains how to get a development environ
   		"RedirectURI": "http://localhost:8080/live"
 		}
 		```
-5. (Optional) If you would like to change what port is used you can set the PORT environment veriable. by default the port used is 8080.
+3. (Optional) If you would like to change what port is used you can set the PORT environment veriable. by default the port used is 8080.
 	1. Example of setting the port to 3000 instead of 8080 using a bash comand
 		```
 		PORT="3000"
 		```
-6. The setup should now be complete the program can be tested and run with the following make command from the project home directory.
+4. The setup should now be complete the program can be tested and run with the following make command from the project home directory.
 	```
 	make all run
 	```
