@@ -1,4 +1,4 @@
-# nerf-controller
+# Nerf-Controller
 This is the code that interfaces and run the web app for the automated nerf gun. This code is created to run on a Raspberry Pi Zero W.
 
 ## Getting Started
@@ -7,55 +7,96 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Install Golang v11.x
-Setup StreamLabs account
-Create StreamLabs API App
-
-```
-Give examples
-```
+[Golang v1.11.x](https://golang.org/doc/install "Golang")
+[StreamLabs account](https://streamlabs.com/ "StreamLabs")
+[StreamLabs API App](https://streamlabs.com/dashboard#/apisettings "StreamLabs API App")
+make
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+A step by step series of examples that explains how to get a development environment running.
 
-Setup config file
+1.  Install Golang
+2. Create a SteamLabs account
+3. Create a StreamLabs Application
+4. Create a StreamLabsAPI.json file in the project home directory to have the correct information for the application you created.
+	1. Example StreamLabsAPI.json:
+```json
+{
+  "ClientID": "7FDyzIU5NPbDLJ0kvB5C5CYSay6VYxNoNmza0RW1",
+  "ClientSecret": "wleRBri2UFhUFYBCdnDhOASgBm2uQ7H60vkC34hB",
+  "RedirectURI": "http://localhost:8080/live"
+}
 ```
-Give the example
+5. (Optional) If you would like to change what port is used you can set the PORT environment veriable. by default the port used is 8080.
+	1. Example of setting the port to 3000 instead of 8080 using a bash comand
+	```
+	PORT="3000"
+	```
+6. The setup should now be complete the program can be tested and run with the following make command from the project home directory.
+```
+make all run
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+If correctly setup you should see the following in the console.
+```
+go fmt
+go test -v ./...
+=== RUN   TestGetPort
+--- PASS: TestGetPort (0.00s)
+=== RUN   TestHomeHandler
+--- PASS: TestHomeHandler (0.00s)
+=== RUN   TestFireHandler
+{Fri, 21 Dec 2018 22:54:35 EST} FIRE!!!
+--- PASS: TestFireHandler (0.00s)
+=== RUN   TestTokenHandler
+{Fri, 21 Dec 2018 22:54:35 EST} https://streamlabs.com/api/v1.0/authorize?client_id=7FDyzIU5NPbDLJ0kvB5C5CYSay6VYxNoNmza0RW1&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flive&response_type=code&scope=donations.read
+{Fri, 21 Dec 2018 22:54:35 EST} https://streamlabs.com/api/v1.0/authorize?client_id=7FDyzIU5NPbDLJ0kvB5C5CYSay6VYxNoNmza0RW1&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flive&response_type=code&scope=donations.read
+--- PASS: TestTokenHandler (0.00s)
+=== RUN   TestRandomPageHandler
+Sorry but it seems this page does not exist...
+Sorry but it seems this page does not exist...
+Sorry but it seems this page does not exist...
+--- PASS: TestRandomPageHandler (0.00s)
+=== RUN   TestFire
+{Fri, 21 Dec 2018 22:54:35 EST} FIRE!!!
+--- PASS: TestFire (0.00s)
+=== RUN   TestRandomValue
+6
+14
+8
+7
+9
+12
+11
+5
+15
+10
+13
+--- PASS: TestRandomValue (0.00s)
+PASS
+ok  	_/Users/rdufrene/work/nerf-contorller	(cached)
+go build -o nerf-controller -v 
+_/Users/rdufrene/work/nerf-contorller
+go build -o nerf-controller -v ./...
+./nerf-controller
+Now listening to port :8080
+```
+Now visiting http://localhost:8080/ should display the user interface.
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-make test
-```
+The tests are run using the make command `make test` in the project home directory.
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
-
-Setup raspberry pi.
+Setup raspberry pi. TODO: Still in progress.
 
 ## Built With
 
 * [Golang](https://golang.org/) - Code Backend and Framework
 * [StreamLabs](https://streamlabs.com/) - Donations Management
+* Make - Code and Compilation Rules Management
 
 ## Contributing
 
