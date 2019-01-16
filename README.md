@@ -1,5 +1,5 @@
 # Nerf-Controller
-This is the code that interfaces and run the web app for the automated nerf gun. This code is created to run on a Raspberry Pi Zero W.
+This code interfaces and run the web app GUI for an automated nerf gun that makes live stream donations into shots at the streamer. Designed to run on a Raspberry Pi Zero W connected to a nerf gun or other method of firing projectiles with a user interface via a web app, the program interfaces with StreamLabs to record donations that will add rounds to the hopper to be fired. The only projectiles to be used are safe to fire at humans such as the Nerf Rival Rounds or similar. Future iterations may have a 3D printable mechanism that can be used to fire the rounds, see the deployment section for more information.
 
 ## Getting Started
 
@@ -14,7 +14,7 @@ make
 
 ### Installing
 
-A step by step series of examples that explains how to get a development environment running.
+A step by step series of examples that explains how to get a development environment running. To build the system that will fire rounds see the Deployment section below.
 
 1.  Install Golang
 2. Create a SteamLabs account
