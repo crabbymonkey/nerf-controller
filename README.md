@@ -91,6 +91,8 @@ The tests are run using the make command `make test` in the project home directo
 
 Setup raspberry pi. TODO: Still in progress.
 
+How to use the application can be found [here](https://github.com/crabbymonkey/nerf-controller/wiki/How-to-Use)
+
 ## Built With
 
 * [Golang](https://golang.org/) - Code Backend and Framework
