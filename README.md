@@ -89,9 +89,9 @@ The tests are run using the make command `make test` in the project home directo
 
 ## Deployment
 
-Setup raspberry pi. TODO: Still in progress.
+*TODO: Development is still in progress so development on a live system is not ready yet.*
 
-How to use the application can be found [here](https://github.com/crabbymonkey/nerf-controller/wiki/How-to-Use)
+How to use the application can be found [here](https://github.com/crabbymonkey/nerf-controller/wiki/How-to-Use).
 
 ## Built With
 
