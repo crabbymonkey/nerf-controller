@@ -220,6 +220,7 @@ func getAccessToken() *AccessToken {
 
 func fire() {
 	logMessage("FIRE!!!")
+	signalToFire()
 }
 
 func saveToken(token string) {
