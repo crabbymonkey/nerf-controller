@@ -14,3 +14,5 @@
 #Config Things
 *.config
 StreamLabsAPI.json
+nerf-controller
+.ftpconfig
