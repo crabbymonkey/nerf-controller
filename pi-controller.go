@@ -18,8 +18,8 @@ func signalToFire() {
 	defer rpio.Close()
 
 	// Setup pins connected to the relays responsible for spinning the launch motor and the firing motor
-	spinPin := rpio.Pin(20)
-	firePin := rpio.Pin(21)
+	spinPin := rpio.Pin(21)
+	firePin := rpio.Pin(20)
 	spinPin.Output()
 	firePin.Output()
 
