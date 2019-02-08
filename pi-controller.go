@@ -9,10 +9,11 @@ import (
 
 func signalToFire() {
 	// Connect to Raspberry PI gpio (i.e. pins on the board)
-	fmt.Println("opening gpio")
+	logMessage("opening gpio")
 	err := rpio.Open()
 	if err != nil {
-		panic(fmt.Sprint("unable to open gpio", err.Error()))
+		fmt.Println("GPIO is not available")
+		return
 	}
 
 	defer rpio.Close()
@@ -25,17 +26,17 @@ func signalToFire() {
 
 	// Spin up the firing motor so it is ready to fire
 	spinPin.High()
-	fmt.Println("gpio SPIN")
-	time.Sleep(time.Second)
+	logMessage("gpio SPIN")
+	time.Sleep(500 * time.Millisecond)
 
 	// Fire the ball by sending the singal to start the fire relay
 	firePin.High()
-	fmt.Println("gpio FIRE")
-	time.Sleep(time.Second)
+	logMessage("gpio FIRE")
+	time.Sleep(500 * time.Millisecond)
 
 	// Turn off the motors
 	firePin.Low()
 	spinPin.Low()
 
-	fmt.Println("gpio OFF")
+	logMessage("gpio OFF")
 }

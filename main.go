@@ -27,6 +27,17 @@ func logMessage(message string) {
 	fmt.Println("{" + currentTime.Format(time.RFC1123) + "} " + message)
 }
 
+func logError(err error) {
+	currentTime := time.Now()
+	log.Fatalln("{" + currentTime.Format(time.RFC1123) + "} " + err.Error())
+	log.Fatalln(err)
+}
+
+func logErrorMessage(err string) {
+	currentTime := time.Now()
+	fmt.Println("{" + currentTime.Format(time.RFC1123) + "} " + err)
+}
+
 func getLifeLeftOfAccessToken(accessToken *AccessToken) time.Duration {
 	return (time.Duration(accessToken.LifeTime) * time.Second) - time.Since(accessToken.TimeBorn)
 }
@@ -53,15 +64,7 @@ func listenAndHandleDonations(accessToken *AccessToken) {
 		}
 
 		refreshAccessToken(accessToken)
-		// timeLeftOnAccessToken := getLifeLeftOfAccessToken(accessToken)
-		// logMessage("Time remaining on access_token: " + (timeLeftOnAccessToken.Round(time.Second)).String())
-		// if timeLeftOnAccessToken < time.Minute {
-		// 	refreshAccessToken(accessToken)
-		// 	if accessToken == nil {
-		// 		log.Fatalln("error refreshing access token")
-		// 		break
-		// 	}
-		// }
+
 		logMessage("checking for donations")
 		donations := getStreamlabsDonations(accessToken, nil, lastDonationID)
 		var donation Donation
@@ -99,25 +102,25 @@ func getStreamlabsDonations(accessToken *AccessToken, numDonations *int, afterDo
 	logMessage("request URL: " + finalURL)
 	resp, err := http.Get(finalURL)
 	if err != nil {
-		log.Fatalln(err)
+		logError(err)
 		return nil
 	}
 	if resp.StatusCode != http.StatusOK {
 		body, _ := ioutil.ReadAll(resp.Body)
-		log.Fatalln("bad response getting access_token: " + string(body))
+		logErrorMessage("bad response getting access_token: " + string(body))
 		return nil
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		logError(err)
 		return nil
 	}
 
 	var rawDonations DonationData
 	err = json.Unmarshal(data, &rawDonations)
 	if err != nil {
-		log.Fatalln(err)
+		logError(err)
 		return nil
 	}
 
@@ -180,19 +183,19 @@ func makeAccesTokenRequest(accessToken *AccessToken, grantType GrantType) {
 
 	bytesRepresentation, err := json.Marshal(message)
 	if err != nil {
-		log.Fatalln("error marshaling request body: " + err.Error())
+		logErrorMessage("error marshaling request body: " + err.Error())
 	}
 
 	resp, err := http.Post("https://streamlabs.com/api/v1.0/token",
 		"application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
-		log.Fatalln(err)
+		logError(err)
 		accessToken = nil
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
 		body, _ := ioutil.ReadAll(resp.Body)
-		log.Fatalln("bad response getting access_token: " + string(body))
+		logErrorMessage("bad response getting access_token: " + string(body))
 		accessToken = nil
 		return
 	}
@@ -201,7 +204,7 @@ func makeAccesTokenRequest(accessToken *AccessToken, grantType GrantType) {
 
 	err = json.NewDecoder(resp.Body).Decode(&accessToken)
 	if err != nil {
-		log.Fatalln("error decoding response for access token: " + err.Error())
+		logErrorMessage("error decoding response for access token: " + err.Error())
 		accessToken = nil
 		return
 	}
@@ -233,19 +236,6 @@ func display(w http.ResponseWriter, tmpl string, data interface{}) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// if isRunning {
-	// 	requestURL, err := url.Parse("/live")
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	requestQuery := requestURL.Query()
-	// 	requestQuery.Set("code", appCode)
-	// 	requestURL.RawQuery = requestQuery.Encode()
-	//
-	// 	logMessage(requestURL.String())
-	// 	http.Redirect(w, r, requestURL.String(), http.StatusSeeOther)
-	// }
-
 	data := Page{
 		PageTitle: "Home",
 	}
@@ -261,7 +251,7 @@ func liveHandler(w http.ResponseWriter, r *http.Request) {
 	if !isRunning && appCode != "" {
 		accessToken := getAccessToken()
 		if accessToken == nil {
-			log.Fatalln("error getting the access token")
+			logErrorMessage("error getting the access token")
 		}
 		isRunning = true
 
@@ -295,7 +285,7 @@ func randomPageHandler(w http.ResponseWriter, r *http.Request) {
 	} else if strings.HasSuffix(r.URL.Path[1:], ".html") {
 		http.ServeFile(w, r, "static/html/"+r.URL.Path[1:])
 	} else {
-		fmt.Println("Sorry but it seems this page does not exist...")
+		logMessage("Sorry but it seems this page does not exist...")
 		errorHandler(w, r, http.StatusNotFound)
 	}
 }
@@ -399,7 +389,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", randomPageHandler)
 	var port = getPort()
-	fmt.Println("Now listening to port " + port)
+	logMessage("Now listening to port " + port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
 
