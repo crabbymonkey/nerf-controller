@@ -18,6 +18,7 @@ import (
 )
 
 var isRunning = false
+var isPaused = false
 var appCode = ""
 var hopper = 0
 var costPerShot = 1.00
@@ -278,6 +279,10 @@ func randomPageHandler(w http.ResponseWriter, r *http.Request) {
 		stopHandler(w, r)
 	} else if r.URL.Path == "/api/hopper" {
 		getHopperSize(w, r)
+	} else if r.URL.Path == "/api/add" {
+		addToHopper(w, r)
+	} else if r.URL.Path == "/api/pause" {
+		pauseHandler(w, r)
 	} else if r.URL.Path == "/api/pricepershot" {
 		pricePerShotHandler(w, r)
 	} else if r.URL.Path == "/api/isrunning" {
@@ -291,14 +296,32 @@ func randomPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func fireHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == http.MethodPost {
 		fire()
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
-
+func pauseHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method == http.MethodPost {
+		if !isPaused {
+			if isRunning {
+				isRunning = false
+			} else {
+				isRunning = true
+			}
+		} else {
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write([]byte("500 - Not activated yet so cannot pause"))
+		}
+	}
+}
 func getHopperSize(res http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(res).Encode(hopper)
+}
+func addToHopper(res http.ResponseWriter, req *http.Request) {
+	if req.Method == http.MethodPost {
+		hopper++
+	}
 }
 func getIsRunning(res http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(res).Encode(isRunning)

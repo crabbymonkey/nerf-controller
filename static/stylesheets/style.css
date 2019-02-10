@@ -5,6 +5,25 @@ body {
   text-decoration: line-through;
 }
 
+.column3 {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+}
+
+.column2 {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
 .footer {
   margin: 0px;
   border-top: 1px solid #444;

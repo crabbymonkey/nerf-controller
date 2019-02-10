@@ -8,24 +8,44 @@
       <div>
         <h1> Welcome to the Interactive Nerf Shooter!</h1>
         <p style="padding:20px;">
-          This is the home page for the nerf shooter, you can test the shooter with the "TEST FIRE!" button. Also, to connect this to other serveices you can fillout the information bellow.
+          This is the home page for the nerf shooter, you can test the shooter with the "TEST FIRE!" button.
         </p>
-        <form method="post" action="/fire">
-          <button type="submit" class="btn btn-warning btn-lg">TEST FIRE!</button>
-        </form>
+        <div class="row">
+          <div class="column2">
+            <form method="post" action="/fire" style="float:right;">
+              <button id="testFireBtn"type="submit" class="btn btn-danger btn-lg" data-toggle="tooltip" title="Test fire, this will mimic what happens when a ball is used to fire when the service is running." data-placement="left">TEST FIRE!</button>
+            </form>
+          </div>
+          <div class="center-container column2">
+            <form method="post" onSubmit="return addToHopper()" style="float:left;">
+              <button id="addBallBtn" type="submit" class="btn btn-warning btn-lg" data-toggle="tooltip" title="Add a ball to the hopper, this can be used for testing or for general additions if somthing goes wrong." data-placement="right">Add Ball</button>
+            </form>
+          </div>
+        </div>
         <hr>
         <h3>Start and Stop the Device</h3>
-        <form method="post" action="/stop" enctype="application/x-www-form-urlencoded">
-          <button id="stopBtn" type="submit" disabled="true" class="btn btn-danger btn-sm">Stop</button>
-        </form>
-        <form method="post" action="/activate" enctype="application/x-www-form-urlencoded">
-          <button id="runBtn" type="submit" disabled="true" class="btn btn-success btn-sm ">Run</button>
-        </form>
+        <div class="row">
+          <div class="center-container column3">
+            <form method="post" action="/stop" style="float:right;" enctype="application/x-www-form-urlencoded">
+              <button id="stopBtn" type="submit" disabled="true" class="btn btn-danger btn-sm" data-toggle="tooltip" title="This will completly stop the survice causing the hopper to empty and unlink your StreamLabs account." data-placement="left">Stop</button>
+            </form>
+          </div>
+          <div class="center-container column3">
+            <form method="post" onSubmit="return pause()" enctype="application/x-www-form-urlencoded">
+              <button id="pauseBtn" type="submit" disabled="true" class="btn btn-warning btn-sm" data-toggle="tooltip" title="Pause this service, when paused it will not add balls to the hopper or fire but once resumed all the events while paused will add balls." data-placement="bottom">Pause</button>
+            </form>
+          </div>
+          <div class="center-container column3">
+            <form method="post" action="/activate" style="float:left;" enctype="application/x-www-form-urlencoded">
+              <button id="runBtn" type="submit" disabled="true" class="btn btn-success btn-sm" data-toggle="tooltip" title="Link this service to your StreamLabs account so that the hopper will fill with when donations, follows and subs occur." data-placement="right">Run</button>
+            </form>
+          </div>
+        </div>
         <hr>
         <h3>Set the Cost to Add a Ball to the Hopper</h3>
         <form method="post" action="/api/pricepershot" enctype="application/x-www-form-urlencoded">
           Current Price Per Shot: <input id="pricepershot" name="pricepershot" onchange="changeOfPrice()" type="number" min="0.01" step="0.01" value="0.00">
-            <button id="priceBtn" type="submit" class="btn btn-primary btn-sm">Set</button>
+            <button id="priceBtn" type="submit" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Set the cost of adding a ball to the hopper. Change is carried over and is accounted for, so if a ball is $1.00 and two $1.50 donations are recieved three balls will be added." data-placement="bottom">Set</button>
         </form>
       </div>
     </div>
@@ -38,11 +58,11 @@
 
   <script>
     // vars to keep upto date
-    var hopperSize
-    var isRunning
-    var pricePerShotValue
+    var hopperSize;
+    var isRunning;
+    var pricePerShotValue;
 
-    var priceHasBeenChanged = false
+    var priceHasBeenChanged = false;
 
     function changeOfPrice() {
       console.log("changeOfPrice");
@@ -62,6 +82,7 @@
       if (isRunning) {
         document.getElementById("stopBtn").disabled = false;
         document.getElementById("runBtn").disabled = true;
+        //document.getElementById("pauseBtn").disabled = false;
       }
       else {
         document.getElementById("runBtn").disabled = false;
@@ -86,6 +107,31 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 hopperSize = xhr.responseText.replace("\n", "");
+            }
+        };
+    }
+
+    function addToHopper() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/add");
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+              updateHopper();
+            }
+        };
+    }
+
+    function pause() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/pause");
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+              if (isRunning) {
+                document.getElementById("pauseBtn").value= "Pause";
+              }
+              document.getElementById("pauseBtn").value= "Resume";
             }
         };
     }
@@ -135,9 +181,18 @@
         pricePerShot.value = parseFloat(pricePerShotValue).toFixed(2);
       }
     }
-    window.onload = updateHopper();
-    window.onload = updateRunning();
-    window.onload = updatePricePerShot();
+
+    window.onload = init();
+
+    function init() {
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+
+      updateHopper();
+      updateRunning();
+      updatePricePerShot();
+    }
 
     setInterval(function() {
       updateHopper();
