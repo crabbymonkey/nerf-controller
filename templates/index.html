@@ -12,12 +12,12 @@
         </p>
         <div class="row">
           <div class="column2">
-            <form method="post" action="/fire" style="float:right;">
+            <form method="post" action="/fire" style="">
               <button id="testFireBtn"type="submit" class="btn btn-danger btn-lg" data-toggle="tooltip" title="Test fire, this will mimic what happens when a ball is used to fire when the service is running." data-placement="left">TEST FIRE!</button>
             </form>
           </div>
           <div class="center-container column2">
-            <form method="post" onSubmit="return addToHopper()" style="float:left;">
+            <form method="post" onSubmit="return addToHopper()" style="">
               <button id="addBallBtn" type="submit" class="btn btn-warning btn-lg" data-toggle="tooltip" title="Add a ball to the hopper, this can be used for testing or for general additions if somthing goes wrong." data-placement="right">Add Ball</button>
             </form>
           </div>
@@ -26,7 +26,7 @@
         <h3>Start and Stop the Device</h3>
         <div class="row">
           <div class="center-container column3">
-            <form method="post" action="/stop" style="float:right;" enctype="application/x-www-form-urlencoded">
+            <form method="post" action="/stop" style="" enctype="application/x-www-form-urlencoded">
               <!-- TODO: For some reason this button bugs out when it has a tooltip -->
               <button id="stopBtn" type="submit" disabled="true" class="btn btn-danger btn-sm">Stop</button>
             </form>
@@ -37,7 +37,7 @@
             </form>
           </div>
           <div class="center-container column3">
-            <form method="post" action="/activate" style="float:left;" enctype="application/x-www-form-urlencoded">
+            <form method="post" action="/activate" style="" enctype="application/x-www-form-urlencoded">
               <button id="runBtn" type="submit" disabled="true" class="btn btn-success btn-sm" data-toggle="tooltip" title="Link this service to your StreamLabs account so that the hopper will fill with when donations, follows and subs occur." data-placement="right">Run</button>
             </form>
           </div>
