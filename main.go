@@ -22,6 +22,8 @@ var isPaused = false
 var appCode = ""
 var hopper = 0
 var costPerShot = 1.00
+var minTimePerShotInSec = 30
+var maxTimePerShotInSec = 300
 
 func logMessage(message string) {
 	currentTime := time.Now()
@@ -52,7 +54,7 @@ func handleFireing() {
 			fire()
 			hopper--
 		}
-		time.Sleep(time.Duration(randomValue(10, 90)) * time.Second)
+		time.Sleep(time.Duration(randomValue(minTimePerShotInSec, maxTimePerShotInSec)) * time.Second)
 	}
 }
 
